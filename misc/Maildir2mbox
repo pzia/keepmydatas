@@ -1,0 +1,37 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import mailbox
+import os.path
+import re
+import sys
+
+try:
+    appname = os.path.split( sys.argv[0] )[1]
+    basename = os.path.splitext( appname )[0]
+    source = sys.argv[1]
+    dest = sys.argv[2]
+
+    # This breaks maildir2mbox into “maildir” and “mbox”.
+    (sfmt, dfmt) = re.match(r'^(.+)2(.+)', basename).groups()
+
+    # Samples for the following lines are:
+    # sbox = mailbox.__dict__['Maildir']("../maildir', factory=None)
+    # dbox = mailbox.__dict__['mbox']("Inbox_mbox')
+
+    # Avoid problematic default rfc822.Message factory,
+    # which caused this error:
+    # File “/usr/lib/python2.6/mailbox.py”, line 331,
+    # in get_message msg.set_subdir(subdir)
+    # AttributeError: Message instance has no attribute "set_subdir'
+    sbox = mailbox.__dict__[sfmt](source, factory=None)
+    dbox = mailbox.__dict__[dfmt](dest)
+
+    for key in sbox.iterkeys():
+        dbox.add( sbox.get_message(key) )
+
+except IndexError:
+    sys.exit("Usage: %s source destination" % appname)
+except (AttributeError, KeyError):
+    sys.exit("ERROR: invalid mailbox type")
+except mailbox.Error, err:
+    sys.exit("ERROR: %s" % err)

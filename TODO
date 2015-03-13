@@ -1,0 +1,27 @@
+TODO :
+IMAGES
+* créer l'arborescence (le datetree) quand elle n'existe pas, notamment pour les images
+  - option --createtree
+  - cela doit permettre d'automatiser l'import d'un upload automatique (Via le client owncloud, par exemple) dans le datetree photos
+* Lire les métas data json des Google Takeout
+* Auto détecter sur la base du nom quand il n'y a pas de méta datas
+* Auto détecter sur la base de la dernière modification quand il n'y a pas de méta datas
+
+MBOX :
+* créer le fichier vide xxx correspondant au xxx.sbd pour ne pas perdre Thunderbird
+
+CHAT :
+* utiliser MBOX pour stocker les conversations
+  - FROM est le chan / nick / protocole
+  - TO : est l'utilisateur (moi)
+  - SUBJECT est [Chat] Conversation avec ...
+  - DATE est le début de la conversation
+  - BODY est une suite nick> Message
+  - En attachement le fichier source
+  - FROM/TO peuvent utiliser la syntaxe "john smith" <john.smith@jabber.com>
+    - pour IRC : nick@serveur.irc.com ou #chan@serveur.irc.com
+    - pour icq : id@icq.com
+    - pour gadu : id@gadugadu.com
+* autodétecter le format de fichier (strict)
+* attention à l'encoding
+

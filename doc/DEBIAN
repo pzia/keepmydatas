@@ -1,0 +1,2 @@
+Required packages :
+  apt-get install mercurial python-pyexiv2 python-magic undbx
