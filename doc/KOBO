@@ -1,0 +1,21 @@
+Use for personal backup.
+
+This is the simplest way that I have found:
+
+    Install Adobe Digital Editions using winetricks
+
+    winetricks adobe_diged
+
+    Download and install ePUBee within the same wine prefix used by Adobe Digital Editions
+
+    $ cd ~/Downloads
+    $ wget http://download.epubee.com/ePUBeeePUBDRMRemoval.exe
+    $ WINEPREFIX=~/.local/share/wineprefixes/adobe_diged/ wine ePUBeeePUBDRMRemoval.exe
+
+    Start Adobe Digital Editions and login to your adobe account
+    Add your DRM'ed books and wait until they are readable (decrypted)
+    Run ePUBee. It should automatically decrypt any files added to Adobe Digital Editions to
+
+    ~/.local/share/wineprefixes/adobe_diged/drive_c/users/${USER}/Application\ Data/decrypt/
+
+
