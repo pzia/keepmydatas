@@ -7,7 +7,6 @@ import KmdFiles
 import KmdEpub
 import os
 import logging
-import ebooklib.epub
 
 class KmdEpubRename(KmdCmd.KmdCommand):
     regexp = None
@@ -25,13 +24,13 @@ class KmdEpubRename(KmdCmd.KmdCommand):
                 pname = os.path.join(root, name)
                 if KmdEpub.isFileEpub(pname):
                     logging.info("Found %s", name)
-                    r = ebooklib.epub.read_epub(pname)
-                    dirname = os.path.join(self.args.folder[0], KmdEpub.metadata(r, 'creator'))
+                    metadatas = KmdEpub.metadatas(pname)
+                    dirname = os.path.join(self.args.folder[0], metadatas['creator'])
                     if not os.path.exists(dirname) :
                         #new tree
                         if self.args.doit :
                             os.makedirs(dirname)
-                    dname = os.path.join(self.args.folder[0], KmdEpub.metadata(r, 'creator'), KmdEpub.metadata(r, 'title')+".epub")
+                    dname = os.path.join(self.args.folder[0], metadatas['creator'], metadatas['title']+".epub")
                     KmdFiles.fileMoveRename(pname, dname, self.args.doit)
 
 if __name__ == "__main__":
