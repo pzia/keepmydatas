@@ -48,6 +48,7 @@ class KmdImagesCheckDateTree(KmdCmd.KmdCommand):
                         pathtest = os.path.join(self.args.datetree[0], d.value.strftime("%Y/%m/%d"))
                     except :
                         logging.warning("Wrong datetime value %s in %s", d.value, p)
+                        KmdFiles.fileMoveRenameToDir(p, self.args.quarantine[0], self.args.doit)
                         continue
                         
                     if pathtest not in ymd :
