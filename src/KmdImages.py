@@ -93,14 +93,14 @@ def compareImagesFiles(f1, f2):
     img2 = Image.open(f2)
     return comparePilImages(img1, img2)
 
-def compareImagesFolder(folder):
+def compareImagesFolder(folder, quick = False):
     """Compare images in a folder"""
     logging.debug("Comparing images in %s", folder)
     files = [os.path.join(folder, x) for x in os.listdir(folder)]
 
-    return compareImagesCollection(files)    
+    return compareImagesCollection(files, quick)    
     
-def compareImagesCollection(files):
+def compareImagesCollection(files, quick = True):
     imgf = []
     samef = []
 
@@ -120,6 +120,8 @@ def compareImagesCollection(files):
       imgf1 = Image.open(f1)
       for f2 in imgf:
         if f2 <= f1 :
+            continue
+        if quick and abs(os.path.getsize(f1) - os.path.getsize(f2)) > 1000 :
             continue
         imgf2 = Image.open(f2)
         if comparePilImages(imgf1, imgf2):
@@ -172,21 +174,27 @@ def mergeExivMetadata(sameImages, doit = False):
                 continue
             newval = None
             if k in metas[mainI].iptc_keys + metas[mainI].exif_keys :
-                if metas[mainI][k].value != metas[pathI][k].value : 
-                    logging.debug("Difference for %s", k)
-                    logging.debug("%s <> %s", metas[mainI][k].value, metas[pathI][k].value)
-                    if k in exiv_handlers :
-                        newval = exiv_handlers[k](metas[mainI][k].value, metas[pathI][k].value)
-                        logging.info("Merged property %s : %s", k, newval)
-                    else :
-                        logging.warn("NO HANDLER for %s", k)
+                try :
+                    if metas[mainI][k].value != metas[pathI][k].value : 
+                        logging.debug("Difference for %s", k)
+                        logging.debug("%s <> %s", metas[mainI][k].value, metas[pathI][k].value)
+                        if k in exiv_handlers :
+                            newval = exiv_handlers[k](metas[mainI][k].value, metas[pathI][k].value)
+                            logging.info("Merged property %s : %s", k, newval)
+                        else :
+                            logging.warn("NO HANDLER for %s", k)
+                except :
+                    logging.warn("Coulnd't compare %s exif property for %s", k, mainI)
             else :
                 newval = metas[pathI][k].value
                 logging.info("Imported property %s : %s", k, newval)
           
             if newval != None :
-                metas[mainI][k] = newval
-                write = True
+                try :
+                    metas[mainI][k] = newval
+                    write = True
+                except :
+                    logging.warn("Coulnd't setup %s exif property for %s", k, mainI)
     if write :
         if "Iptc.Application2.Keywords" in metas[mainI].iptc_keys:
             metas[mainI]["Iptc.Application2.Keywords"] = handler_mergeList(metas[mainI]["Iptc.Application2.Keywords"].value, exiv_changed_keywords)
@@ -201,9 +209,9 @@ def mergeExivMetadata(sameImages, doit = False):
         del(metas[m])
     del(metas)
             
-def cleanDir(folder, doit = False):
+def cleanDir(folder, doit = False, quick = True):
     logging.info("Cleaning %s", folder)
-    samef = compareImagesFolder(folder)
+    samef = compareImagesFolder(folder, quick = True)
     for s in samef :
         mergeExivMetadata(s, doit)
     del(samef)
@@ -213,5 +221,5 @@ def cleanDir(folder, doit = False):
 
         if os.path.isdir(p):
             logging.debug("Testing %s", p)        
-            cleanDir(p, doit)
+            cleanDir(p, doit, quick = True)
 
