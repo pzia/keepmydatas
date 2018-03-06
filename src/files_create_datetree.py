@@ -29,6 +29,7 @@ class KmdFilesMove(KmdCmd.KmdCommand):
                     KmdFiles.fileMoveRenameToDirIfOld(pname, dname, int(self.args.age[0]), self.args.doit)
                 except :
                     logging.error("Bad move from %s to %s", pname, dname)
+        KmdFiles.removeEmptyFolders(self.args.source[0], self.args.doit)
                 
 if __name__ == "__main__":
     cmd = KmdFilesMove(__doc__)
