@@ -81,9 +81,23 @@ def handler_doubles(fileslist,directory,files):
             else:
                 fileslist[filesize] = [filepath]
 
-def FIXME_modification_date(filename):
+def get_modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
+
+def fileMoveRenameToDirIfOld(pname, dname, minage, doit = False) :
+
+    t = get_modification_date(pname)
+    oldest = datetime.datetime.now()-datetime.timedelta(days=minage)
+    if t < oldest :
+        pathdest = os.path.join(dname, t.strftime("%Y/%m"))
+        if not os.path.exists(pathdest):
+            logging.warning("%s does not exist", pathdest)
+            if doit :
+                os.makedirs(pathdest)
+        logging.debug("DEST TREE : %s", pathdest)
+        fileMoveRenameToDir(pname, pathdest, doit)
+
     
 def fileMoveRename(pname, dname, doit = False):
     count = 0
