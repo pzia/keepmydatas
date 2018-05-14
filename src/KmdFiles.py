@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Files utils.
 Some scripts have been authored by Sebastien SAUVAGE <sebsauvage at sebsauvage dot net> http://sebsauvage.net/python/

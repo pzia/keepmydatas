@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Parse tree and find files matching owncloud conflict file pattern.
 If the conflict file has the same sha256 as the initial file, remove it.

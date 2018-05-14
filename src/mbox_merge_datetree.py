@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Compare all messages within a tree with those stored in a date tree (yyyy/mm)"""
 

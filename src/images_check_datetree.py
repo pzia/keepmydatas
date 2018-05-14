@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Compare all photos within a date tree (yyyy/mm/dd/*) and remove images without metadatas"""
 
