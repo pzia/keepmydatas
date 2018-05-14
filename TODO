@@ -1,4 +1,7 @@
 TODO :
+PYTHON3
+- en profiter pour intégrer des tests unitaires ?
+
 IMAGES
 * créer l'arborescence (le datetree) quand elle n'existe pas, notamment pour les images
   - option --createtree
