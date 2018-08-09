@@ -11,16 +11,19 @@ import time
 import os
 import logging
 
+
 class KmdMboxMergeImapDateTree(KmdCmd.KmdCommand):
 
     def extendParser(self):
         super(KmdMboxMergeImapDateTree, self).extendParser()
-        #Extend parser
-        self.parser.add_argument('account', metavar='<username@hostname:991/path/to/folder>', nargs=1, help='imaps account')                
-        self.parser.add_argument('datetree', metavar='</path/to/datetree>', nargs=1, help='Root of a mbox date tree /aaaa/mm')
-        #FIXME : option for duplicate storage, default in /path/to/datetree/duplicates
-        #FIXME : option for misc storage, default in /path/to/datetree/misc
-        
+        # Extend parser
+        self.parser.add_argument(
+            'account', metavar='<username@hostname:991/path/to/folder>', nargs=1, help='imaps account')
+        self.parser.add_argument('datetree', metavar='</path/to/datetree>',
+                                 nargs=1, help='Root of a mbox date tree /aaaa/mm')
+        # FIXME : option for duplicate storage, default in /path/to/datetree/duplicates
+        # FIXME : option for misc storage, default in /path/to/datetree/misc
+
     def parseAccount(self):
         account = self.args.account[0]
         at = account.find('@')
@@ -36,78 +39,82 @@ class KmdMboxMergeImapDateTree(KmdCmd.KmdCommand):
         hostname = account[at+1:colonport]
         port = account[colonport+1:slash]
         srcpath = account[slash+1:]
-        logging.debug("Connexions parms : %s, %s, %s, %s, %s" % (username, password, hostname, port, srcpath))
+        logging.debug("Connexions parms : %s, %s, %s, %s, %s" %
+                      (username, password, hostname, port, srcpath))
         return username, password, hostname, port, srcpath
 
     def run(self):
-        username, password, hostname, port, srcpath  = self.parseAccount()
-        logging.info("Connecting : %s, %s, %s, %s, %s" % (username, password, hostname, port, srcpath))
+        username, password, hostname, port, srcpath = self.parseAccount()
+        logging.info("Connecting : %s, %s, %s, %s, %s" %
+                     (username, password, hostname, port, srcpath))
         datetree = self.args.datetree[0]
         filedestdatepattern = "%Y.sbd/%Y-%m"
         messagehashs = []
         mboxfiles = {}
         doit = self.args.doit
-        dupcount, miscount, keepcount = 0,0,0
+        dupcount, miscount, keepcount = 0, 0, 0
 
         M = imaplib.IMAP4_SSL(hostname, port)
         M.login(username, password)
         M.select(srcpath)
         typd, data = M.search(None, 'ALL')
-        
+
         for num in data[0].split():
             typ, dat = M.fetch(num, '(RFC822)')
             logging.debug('Message %s' % num)
 #            print(dat)
             m = mailbox.Message(dat[0][1])
             duplicate = False
-            #for each message
-            h = KmdMbox.messageHash(m) #hashmessage
-            if h in messagehashs :
-                #already known message
+            # for each message
+            h = KmdMbox.messageHash(m)  # hashmessage
+            if h in messagehashs:
+                # already known message
                 dupcount += 1
                 duplicate = True
 
             vdate = KmdMbox.messageGetDate(m)
-            if vdate == None :
+            if vdate == None:
                 mboxname = os.path.join(datetree, "_misc_")
                 miscount += 1
-            else :
-                mboxname = os.path.join(datetree, time.strftime(filedestdatepattern, vdate))
+            else:
+                mboxname = os.path.join(
+                    datetree, time.strftime(filedestdatepattern, vdate))
 
             if duplicate:
                 mboxname += ".dup"
-                
+
             if mboxname not in mboxfiles:
-                #File not already open
+                # File not already open
                 head, tail = os.path.split(mboxname)
-                if not os.path.exists(head) :
-                    #new tree
-                    if doit :
+                if not os.path.exists(head):
+                    # new tree
+                    if doit:
                         os.makedirs(head)
                     logging.debug("Creating %s tree", head)
-                #create or open mbox
+                # create or open mbox
                 if not os.path.exists(mboxname):
                     logging.info("Creating MBOX %s", mboxname)
-                    if doit :
+                    if doit:
                         mboxfiles[mboxname] = mailbox.mbox(mboxname)
-                    else :
-                        mboxfiles[mboxname] = "foobar" #to fool mbox opening test
-                        
-                else :
+                    else:
+                        # to fool mbox opening test
+                        mboxfiles[mboxname] = "foobar"
+
+                else:
                     logging.info("Opening MBOX %s", mboxname)
                     mboxfiles[mboxname] = mailbox.mbox(mboxname)
-                    #walk the mbox to append newhash
-                    if not duplicate :
+                    # walk the mbox to append newhash
+                    if not duplicate:
                         for m2 in mboxfiles[mboxname]:
                             messagehashs.append(KmdMbox.messageHash(m2))
-                    
-                #test against the newhashs
-                if not duplicate and h in messagehashs :
+
+                # test against the newhashs
+                if not duplicate and h in messagehashs:
                     mboxname += ".dup"
                     dupcount += 1
                     if mboxname not in mboxfiles:
                         mboxfiles[mboxname] = mailbox.mbox(mboxname)
-            if doit :
+            if doit:
                 KmdMbox.messageAddToMbox(mboxfiles[mboxname], m)
 
             keepcount += 1
@@ -119,4 +126,3 @@ class KmdMboxMergeImapDateTree(KmdCmd.KmdCommand):
 if __name__ == "__main__":
     cmd = KmdMboxMergeImapDateTree(__doc__)
     cmd.run()
-

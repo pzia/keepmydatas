@@ -4,8 +4,10 @@ Arg1 : <path> #zip file path
 Arg2 : <path> #where to extract
 """
 
-import os, sys
+import os
+import sys
 import zipfile
+
 
 def extractZip(zpath, to):
     if not os.path.isfile(zpath):
@@ -15,6 +17,7 @@ def extractZip(zpath, to):
 
     zf = zipfile.ZipFile(zf)
     zf.extractall(to)
+
 
 if __name__ == "__main__":
     extractZip(sys.argv[1], sys.argv[2])

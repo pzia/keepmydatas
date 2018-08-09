@@ -6,19 +6,26 @@ Some scripts have been authored by Sebastien SAUVAGE <sebsauvage at sebsauvage d
 
 import logging
 import datetime
-import os, os.path, string, sys, sha
-import time, os, sys
+import os
+import os.path
+import string
+import sys
+import sha
+import time
+import os
+import sys
 import shutil
 from stat import *
 
-def fileSHA ( filepath ) :
+
+def fileSHA(filepath):
     """ Compute SHA (Secure Hash Algorythm) of a file.
         Input : filepath : full path and name of file (eg. 'c:\windows\emm386.exe')
         Output : string : contains the hexadecimal representation of the SHA of the file.
                           returns '0' if file could not be read (file not found, no read rights...)
     """
     try:
-        file = open(filepath,'rb')
+        file = open(filepath, 'rb')
         digest = sha.new()
         data = file.read(65536)
         while len(data) != 0:
@@ -30,17 +37,18 @@ def fileSHA ( filepath ) :
     else:
         return digest.hexdigest()
 
-def treeDetectDoubles( directories ):
+
+def treeDetectDoubles(directories):
     fileslist = {}
     # Group all files by size (in the fileslist dictionnary)
     for directory in directories:
         directory = os.path.abspath(directory)
         logging.info("Scanning directory %s", directory)
-        os.path.walk(directory,handler_doubles,fileslist)
+        os.path.walk(directory, handler_doubles, fileslist)
 
     logging.info('Comparing files...')
     # Remove keys (filesize) in the dictionnary which have only 1 file
-    for (filesize,listoffiles) in fileslist.items():
+    for (filesize, listoffiles) in fileslist.items():
         if len(listoffiles) == 1:
             del fileslist[filesize]
 
@@ -50,8 +58,8 @@ def treeDetectDoubles( directories ):
     ntotal = len(fileslist)
     n = 0
 
-    while len(fileslist)>0:
-        (filesize,listoffiles) = fileslist.popitem()
+    while len(fileslist) > 0:
+        (filesize, listoffiles) = fileslist.popitem()
         for filepath in listoffiles:
             sha = fileSHA(filepath)
             if filessha.has_key(sha):
@@ -59,21 +67,22 @@ def treeDetectDoubles( directories ):
             else:
                 filessha[sha] = [filepath]
         if n % 100 == 0:
-            sys.stderr.write("%.2f %%\r" % (float(n*100)/float(ntotal)) )
-        n+=1
+            sys.stderr.write("%.2f %%\r" % (float(n*100)/float(ntotal)))
+        n += 1
 
     if filessha.has_key('0'):
         del filessha['0']
 
     # Remove keys (sha) in the dictionnary which have only 1 file
-    for (sha,listoffiles) in filessha.items():
+    for (sha, listoffiles) in filessha.items():
         if len(listoffiles) == 1:
             del filessha[sha]
     return filessha
 
-def handler_doubles(fileslist,directory,files):
+
+def handler_doubles(fileslist, directory, files):
     for fileName in files:
-        filepath = os.path.join(directory,fileName)
+        filepath = os.path.join(directory, fileName)
         if os.path.isfile(filepath):
             filesize = os.stat(filepath)[6]
             if fileslist.has_key(filesize):
@@ -81,25 +90,27 @@ def handler_doubles(fileslist,directory,files):
             else:
                 fileslist[filesize] = [filepath]
 
+
 def get_modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
-def fileMoveRenameToDirIfOld(pname, dname, minage, doit = False) :
+
+def fileMoveRenameToDirIfOld(pname, dname, minage, doit=False):
 
     t = get_modification_date(pname)
     oldest = datetime.datetime.now()-datetime.timedelta(days=minage)
-    if t < oldest :
+    if t < oldest:
         pathdest = os.path.join(dname, t.strftime("%Y/%m"))
         if not os.path.exists(pathdest):
             logging.warning("%s does not exist", pathdest)
-            if doit :
+            if doit:
                 os.makedirs(pathdest)
         logging.debug("DEST TREE : %s", pathdest)
         fileMoveRenameToDir(pname, pathdest, doit)
 
-    
-def fileMoveRename(pname, dname, doit = False):
+
+def fileMoveRename(pname, dname, doit=False):
     count = 0
     head, tail = os.path.splitext(dname)
     while os.path.exists(dname):
@@ -109,31 +120,35 @@ def fileMoveRename(pname, dname, doit = False):
     if doit:
         shutil.move(pname, dname)
 
-def fileMoveRenameToDir(pname, dest, doit = False):
+
+def fileMoveRenameToDir(pname, dest, doit=False):
     head, tail = os.path.split(pname)
     fileMoveRename(pname, os.path.join(dest, tail), doit)
-    
-def treeShrink(path, nbfiles = 1, doit = False):
+
+
+def treeShrink(path, nbfiles=1, doit=False):
     for root, dirs, files in os.walk(path):
         logging.debug("Entering %s", root)
         if len(files) <= nbfiles and len(files) > 0 and len(dirs) == 0:
             logging.debug("Moving one level up file(s) from %s", root)
-            for name in files :
-                fileMoveRename(os.path.join(root, name), os.path.join(root, "..", "%s_%s" % (root, name)), doit)
+            for name in files:
+                fileMoveRename(os.path.join(root, name), os.path.join(
+                    root, "..", "%s_%s" % (root, name)), doit)
             logging.info("Rmdir %s", root)
-            if doit :
+            if doit:
                 os.rmdir(root)
-                
-def removeEmptyFolders(path, doit = False):
+
+
+def removeEmptyFolders(path, doit=False):
     """Traverse tree and remove empty folders"""
-    #FIXME : should use walk !
+    # FIXME : should use walk !
     if not os.path.isdir(path) or os.path.islink(path):
         return
 
     # remove empty subfolders
-    try :
+    try:
         files = os.listdir(path)
-    except :
+    except:
         logging.debug("Exception when listing dir %s", path)
         return
 
@@ -149,9 +164,8 @@ def removeEmptyFolders(path, doit = False):
         if os.path.islink(path):
             return
         logging.info("Removing empty folder %s", path)
-        if doit :
-            try :
+        if doit:
+            try:
                 os.rmdir(path)
-            except :
-                logging.warn("Could not remove %s",path)
-
+            except:
+                logging.warn("Could not remove %s", path)

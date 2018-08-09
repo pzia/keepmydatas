@@ -9,30 +9,32 @@ from lxml import etree
 
 mimtype = "application/epub+zip"
 
-def isFileEpub(path, forceMime = False):
+
+def isFileEpub(path, forceMime=False):
     magicline = ""
-    try :
+    try:
         if not os.path.exists(path):
             logging.debug("%s does not exist" % path)
             return False
         # prepare to read from the .epub file
         zf = zipfile.ZipFile(path)
         mime = zf.read('mimetype')
-    
+
         if mime.strip() != "application/epub+zip" and not forceMime:
-            return False    
+            return False
 
         return True
-    except :
+    except:
         logging.debug("Something went testing epub candidate %s", path)
         return False
 
+
 def metadatas(fname):
-    try :
+    try:
         ns = {
-            'n':'urn:oasis:names:tc:opendocument:xmlns:container',
-            'pkg':'http://www.idpf.org/2007/opf',
-            'dc':'http://purl.org/dc/elements/1.1/'
+            'n': 'urn:oasis:names:tc:opendocument:xmlns:container',
+            'pkg': 'http://www.idpf.org/2007/opf',
+            'dc': 'http://purl.org/dc/elements/1.1/'
         }
 
         # prepare to read from the .epub file
@@ -41,31 +43,33 @@ def metadatas(fname):
         # find the contents metafile
         txt = zf.read('META-INF/container.xml')
         tree = etree.fromstring(txt)
-        cfname = tree.xpath('n:rootfiles/n:rootfile/@full-path',namespaces=ns)[0]
+        cfname = tree.xpath(
+            'n:rootfiles/n:rootfile/@full-path', namespaces=ns)[0]
 
         # grab the metadata block from the contents metafile
         cf = zf.read(cfname)
         tree = etree.fromstring(cf)
-        px = tree.xpath('/pkg:package/pkg:metadata',namespaces=ns)
+        px = tree.xpath('/pkg:package/pkg:metadata', namespaces=ns)
         p = px[0]
 
         # repackage the data
         res = {}
-        for s in ['title','language','creator','date','identifier']:
-            try :
-                r = p.xpath('dc:%s/text()'%(s),namespaces=ns)
+        for s in ['title', 'language', 'creator', 'date', 'identifier']:
+            try:
+                r = p.xpath('dc:%s/text()' % (s), namespaces=ns)
                 v = r[0]
-            except :  
+            except:
                 v = "Unknown"
             res[s] = v.strip()
         return res
-    except :
+    except:
         return None
 
-def metadata(epub, name, default = "Unknown") :
+
+def metadata(epub, name, default="Unknown"):
     import ebooklib.epub
-    try :
+    try:
         d = epub.get_metadata('DC', name)[0][0].strip()
         return d
-    except :
+    except:
         return default
