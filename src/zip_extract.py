@@ -13,7 +13,7 @@ def extractZip(zpath, to):
     if not os.path.isdir(to):
         return
 
-    zf = zipfile.ZipFile(zf)
+    zf = zipfile.ZipFile(zpath)
     zf.extractall(to)
 
 if __name__ == "__main__":
