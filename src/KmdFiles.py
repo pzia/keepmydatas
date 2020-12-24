@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Files utils.
 Some scripts have been authored by Sebastien SAUVAGE <sebsauvage at sebsauvage dot net> http://sebsauvage.net/python/
@@ -6,8 +6,8 @@ Some scripts have been authored by Sebastien SAUVAGE <sebsauvage at sebsauvage d
 
 import logging
 import datetime
-import os, os.path, string, sys, sha
-import time, os, sys
+import os, string, sys, hashlib
+import time
 import shutil
 from stat import *
 
@@ -19,7 +19,7 @@ def fileSHA ( filepath ) :
     """
     try:
         file = open(filepath,'rb')
-        digest = sha.new()
+        digest = hashlib.sha256()
         data = file.read(65536)
         while len(data) != 0:
             digest.update(data)
@@ -36,12 +36,14 @@ def treeDetectDoubles( directories ):
     for directory in directories:
         directory = os.path.abspath(directory)
         logging.info("Scanning directory %s", directory)
-        os.path.walk(directory,handler_doubles,fileslist)
+        for d, dirnames, filenames in os.walk(directory):
+            handler_doubles(fileslist, d, filenames)
 
-    logging.info('Comparing files...')
+    logging.info("Comparing %d files..." % len(fileslist))
     # Remove keys (filesize) in the dictionnary which have only 1 file
-    for (filesize,listoffiles) in fileslist.items():
-        if len(listoffiles) == 1:
+    #print(fileslist)
+    for filesize in fileslist.copy():
+        if len(fileslist[filesize]) == 1:
             del fileslist[filesize]
 
     # Now compute SHA of files that have the same size,
@@ -50,11 +52,12 @@ def treeDetectDoubles( directories ):
     ntotal = len(fileslist)
     n = 0
 
-    while len(fileslist)>0:
-        (filesize,listoffiles) = fileslist.popitem()
+    for filesize in fileslist:
+        listoffiles = fileslist[filesize]
         for filepath in listoffiles:
             sha = fileSHA(filepath)
-            if filessha.has_key(sha):
+            #print(sha, filepath)
+            if sha in filessha:
                 filessha[sha].append(filepath)
             else:
                 filessha[sha] = [filepath]
@@ -62,13 +65,14 @@ def treeDetectDoubles( directories ):
             sys.stderr.write("%.2f %%\r" % (float(n*100)/float(ntotal)) )
         n+=1
 
-    if filessha.has_key('0'):
+    if '0' in filessha:
         del filessha['0']
 
     # Remove keys (sha) in the dictionnary which have only 1 file
-    for (sha,listoffiles) in filessha.items():
-        if len(listoffiles) == 1:
+    for sha in filessha.copy():
+        if len(filessha[sha]) == 1:
             del filessha[sha]
+    #print(filessha)
     return filessha
 
 def handler_doubles(fileslist,directory,files):
@@ -76,14 +80,18 @@ def handler_doubles(fileslist,directory,files):
         filepath = os.path.join(directory,fileName)
         if os.path.isfile(filepath):
             filesize = os.stat(filepath)[6]
-            if fileslist.has_key(filesize):
+            if filesize in fileslist:
                 fileslist[filesize].append(filepath)
+                logging.debug("known filesize %d", filesize)
             else:
                 fileslist[filesize] = [filepath]
 
 def get_modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
+
+def set_modification_date(filename, ts):
+    os.utime(filename,(ts, ts))
 
 def fileMoveRenameToDirIfOld(pname, dname, minage, doit = False) :
 
