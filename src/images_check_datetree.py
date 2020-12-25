@@ -25,9 +25,9 @@ class KmdImagesCheckDateTree(KmdCmd.KmdCommand):
         #Keep it simple and like this : just loading image when needed, and use the file cache for performance.
         logging.warn(self.args.quarantine[0])
 
-        for root, dirs, files in os.walk(self.args.datetree[0]):
+        for root, _, files in os.walk(self.args.datetree[0]):
             #For each folder in the src tree
-            quarantine = False
+            #quarantine = False
             for name in files:
                 #for each file in the folder
                 p = os.path.join(root, name)

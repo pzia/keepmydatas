@@ -20,17 +20,17 @@ class KmdFilesMove(KmdCmd.KmdCommand):
         
     def run(self):
         mboxpath = self.args.mbox[0]
-        doit = self.args.doit :
+        doit = self.args.doit
     
         if not os.path.isfile(mboxpath) :
-            logging.info("Create new MBOX in %s, mbopath)
+            logging.info("Create new MBOX in %s", mboxpath)
         if doit :
             tombox = mailbox.mbox(mboxpath)
 
         c = 0
         
         logging.info("Parsing %s", self.args.tree[0])
-        for root, dirs, files in os.walk(self.args.tree[0]):
+        for root, _, files in os.walk(self.args.tree[0]):
             logging.debug("Walking in %s", root)
             for name in files:
                 pname = os.path.join(root, name)

@@ -34,7 +34,7 @@ class KmdMboxMergeDateTree(KmdCmd.KmdCommand):
             #Rename duplicates mbox to avoid huge overhead at runtime
             KmdFiles.fileMoveRename(os.path.join(datetree, dupmboxname), os.path.join(datetree, dupmboxname), doit)
      
-        for root, dirs, files in os.walk(srctree):
+        for root, _, files in os.walk(srctree):
             #For each folder in the src tree
             for name in files:
                 dupcount, miscount, keepcount = 0,0,0
@@ -76,7 +76,7 @@ class KmdMboxMergeDateTree(KmdCmd.KmdCommand):
                         
                     if mboxname not in mboxfiles:
                         #File not already open
-                        head, tail = os.path.split(mboxname)
+                        head, _ = os.path.split(mboxname)
                         if not os.path.exists(head) :
                             #new tree
                             if doit :

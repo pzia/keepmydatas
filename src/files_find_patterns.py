@@ -18,15 +18,15 @@ class KmdFindPatterns(KmdCmd.KmdCommand):
      
         patterns = {} #store patterns and matching file names
         knownpatterns = [
-            r'\w*(\d\d\d\d)(\d\d)(\d\d)[_t]\d\d\d\d\d.*?\.jpg',
+            r'^(\d\d\d\d)(\d\d)(\d\d)[_t]\d\d\d\d\d.*?\.jpg',
             r'(\d\d\d\d)-(\d\d)-(\d\d) \d\d\.\d\d\.\d\d.*?\.jpg',
             r'img(\d\d)(\d\d)(\d\d)-\d\d\d\d.*?\.jpg',
             ]
         
-        rechar = re.compile(r'\w')
+        #rechar = re.compile(r'\w')
         reint = re.compile(r'\d')
         
-        for root, dirs, files in os.walk(self.args.srctree[0]):
+        for root, _, files in os.walk(self.args.srctree[0]):
             for name in files:
                 known = False
                 for k in knownpatterns :
@@ -42,7 +42,7 @@ class KmdFindPatterns(KmdCmd.KmdCommand):
                 pat = r""
                 for c in range(0, len(name)):
                     if reint.match(name[c]):
-                        pat += '\d'
+                        pat += r'\d'
                     else : 
                         pat += name[c].lower()
                 if pat not in patterns :
@@ -52,7 +52,7 @@ class KmdFindPatterns(KmdCmd.KmdCommand):
         def sbylen(k):
             return len(patterns[k])
         sp = sorted(patterns, key=sbylen, reverse=True)
-        patterns2 = {}
+        #patterns2 = {}
 
         for p in sp :
             if len(patterns[p]) < 2:

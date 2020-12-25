@@ -110,7 +110,7 @@ def compareImagesCollection(files, quick = True):
             logging.info("Not a file : %s" % fpath)
             continue
         try:
-            img = Image.open(fpath)
+            Image.open(fpath)
             imgf.append(fpath)
         except:
             logging.info("Not an image : %s" % fpath)

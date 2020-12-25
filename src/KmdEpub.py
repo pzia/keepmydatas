@@ -10,7 +10,7 @@ from lxml import etree
 mimtype = "application/epub+zip"
 
 def isFileEpub(path, forceMime = False):
-    magicline = ""
+    #magicline = ""
     try :
         if not os.path.exists(path):
             logging.debug("%s does not exist" % path)

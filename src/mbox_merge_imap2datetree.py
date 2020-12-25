@@ -52,10 +52,10 @@ class KmdMboxMergeImapDateTree(KmdCmd.KmdCommand):
         M = imaplib.IMAP4_SSL(hostname, port)
         M.login(username, password)
         M.select(srcpath)
-        typd, data = M.search(None, 'ALL')
+        _, data = M.search(None, 'ALL')
         
         for num in data[0].split():
-            typ, dat = M.fetch(num, '(RFC822)')
+            _, dat = M.fetch(num, '(RFC822)')
             logging.debug('Message %s' % num)
 #            print(dat)
             m = mailbox.Message(dat[0][1])
@@ -79,7 +79,7 @@ class KmdMboxMergeImapDateTree(KmdCmd.KmdCommand):
                 
             if mboxname not in mboxfiles:
                 #File not already open
-                head, tail = os.path.split(mboxname)
+                head, _ = os.path.split(mboxname)
                 if not os.path.exists(head) :
                     #new tree
                     if doit :

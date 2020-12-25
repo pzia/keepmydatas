@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import mailbox
 import os.path
@@ -33,5 +33,5 @@ except IndexError:
     sys.exit("Usage: %s source destination" % appname)
 except (AttributeError, KeyError):
     sys.exit("ERROR: invalid mailbox type")
-except mailbox.Error, err:
+except (mailbox.Error, err):
     sys.exit("ERROR: %s" % err)

@@ -16,12 +16,12 @@ class KmdFindPatterns(KmdCmd.KmdCommand):
 
     def run(self):
      
-        patterns = {} #store patterns and matching file names
+        #patterns = {} #store patterns and matching file names
         knownpatterns = [
             r'^(\d\d\d\d)(\d\d)(\d\d)_.*?$',
             ]
                 
-        for root, dirs, files in os.walk(self.args.srctree[0]):
+        for root, _, files in os.walk(self.args.srctree[0]):
             for name in files:
                 #for each file in the folder
                 p = os.path.join(root, name)

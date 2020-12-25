@@ -23,7 +23,7 @@ class KmdOwncloudRename(KmdCmd.KmdCommand):
 
         for folder in self.args.folders :
             logging.info("Running in %s", folder) 
-            for root, dirs, files in os.walk(folder): 
+            for root, _, files in os.walk(folder): 
                 for i in files:
                     m = owncloudre.search("%s" % i)
                     if m is not None :

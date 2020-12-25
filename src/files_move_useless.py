@@ -35,8 +35,8 @@ class KmdFilesMove(KmdCmd.KmdCommand):
         r = r.replace("*", ".*")
         r = r.replace("?", ".?")
         #restore special characters
-        r = r.replace("[DOT]", "\.")
-        r = r.replace("[DOLLARS]", "\$")
+        r = r.replace("[DOT]", r"\.")
+        r = r.replace("[DOLLARS]", r"\$")
         
         r = r+"$"
         return r
@@ -60,7 +60,7 @@ class KmdFilesMove(KmdCmd.KmdCommand):
             return
 
         logging.info("Parsing %s", self.args.tree[0])
-        for root, dirs, files in os.walk(self.args.tree[0]):
+        for root, _, files in os.walk(self.args.tree[0]):
             logging.debug("Walking in %s", root)
             for name in files:
                 pname = os.path.join(root, name)

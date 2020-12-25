@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-import os, os.path, string, sys, sha
+import os, os.path, string, sys, hashlib
 import time, os, sys
 from stat import *
 
@@ -33,7 +33,7 @@ def fileSHA ( filepath ) :
     """
     try:
         file = open(filepath,'rb')
-        digest = sha.new()
+        digest = hashlib.sha256()
         data = file.read(65536)
         while len(data) != 0:
             digest.update(data)
@@ -69,7 +69,7 @@ def detectDoubles( directories ):
         (filesize,listoffiles) = fileslist.popitem()
         for filepath in listoffiles:
             sha = fileSHA(filepath)
-            if filessha.has_key(sha):
+            if sha in filessha:
                 filessha[sha].append(filepath)
             else:
                 filessha[sha] = [filepath]
@@ -77,7 +77,7 @@ def detectDoubles( directories ):
             sys.stderr.write("%.2f %%\r" % (float(n*100)/float(ntotal)) )
         n+=1
 
-    if filessha.has_key('0'):
+    if '0' in filessha:
         del filessha['0']
 
     # Remove keys (sha) in the dictionnary which have only 1 file
@@ -108,18 +108,18 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2 :
         doubles = detectDoubles(sys.argv[1].split(';'))
-        print 'The following files are identical:'
+        print('The following files are identical:')
         for filesha in doubles.keys():
             print('\n---')
             for p in doubles[filesha]:
-                print p, modification_date(p)
+                print(p, modification_date(p))
     #    print '\n'.join(["----\n%s" % '\n'.join(doubles[filesha]) for filesha in doubles.keys()])
-        print '----'
+        print('----')
     elif len(sys.argv) == 3 :
         cmppath = sys.argv[1].split(';')
         delpath = sys.argv[2].split(';')
-        print "Matching files in %s" % cmppath
-        print "Deleting files matching any of the following %s" % delpath
+        print("Matching files in %s" % cmppath)
+        print("Deleting files matching any of the following %s" % delpath)
         doubles = detectDoubles(cmppath)
 
         for fsha in doubles.keys():
@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 try :
                     os.utime(p,(maxtime,mintime))
                 except :
-                    print "Couldn't not set min timestamp, still going on"
+                    print("Couldn't not set min timestamp, still going on")
 
             for path in doubles[fsha]:
                 for dpath in delpath:
@@ -152,10 +152,10 @@ if __name__ == "__main__":
                 for path in ftodel:
                     try :
                         os.remove(path)
-                        print "Removing %s" % path
+                        print("Removing %s" % path)
                     except:
-                        print "ERROR removing %s" % path
+                        print("ERROR removing %s" % path)
             else:
-                print "Keeping %s" % ftodel
+                print("Keeping %s" % ftodel)
     else:
-        print message
+        print(message)

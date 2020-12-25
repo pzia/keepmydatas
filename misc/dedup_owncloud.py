@@ -24,7 +24,7 @@ def md5Checksum(filePath):
 
 def unconflict_directory(path):
     print("Running in %s" % path) 
-    for root, dirs, files in os.walk(path): 
+    for root, _, files in os.walk(path): 
         for i in files:
             m = owncloudre.match(i)
             if m != None :

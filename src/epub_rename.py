@@ -18,7 +18,7 @@ class KmdEpubRename(KmdCmd.KmdCommand):
         
     def run(self):
         logging.info("Parsing %s", self.args.tree[0])
-        for root, dirs, files in os.walk(self.args.tree[0]):
+        for root, _, files in os.walk(self.args.tree[0]):
             logging.debug("Walking in %s", root)
             for name in files:
                 pname = os.path.join(root, name)

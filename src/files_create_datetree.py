@@ -15,12 +15,12 @@ class KmdFilesMove(KmdCmd.KmdCommand):
         #Extend parser
         self.parser.add_argument('source', metavar='</path/to/tree>', nargs=1, help='The source tree')
         self.parser.add_argument('tree', metavar='</path/to/dest>', nargs=1, help='Folder to put matching files')
-        self.parser.add_argument('age', metavar='</path/to/dest>', nargs=1, help='age')
+        self.parser.add_argument('age', metavar='<days>', nargs=1, help='age')
 
         
     def run(self):
         logging.info("Parsing %s", self.args.source[0])
-        for root, dirs, files in os.walk(self.args.source[0]):
+        for root, _, files in os.walk(self.args.source[0]):
             logging.debug("Walking in %s", root)
             for name in files:
                 pname = os.path.join(root, name)

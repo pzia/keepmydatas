@@ -24,7 +24,7 @@ class KmdImagesMergeDateTree(KmdCmd.KmdCommand):
         #Please note that is a WRONG good idea to store the PIL.Images in a dictionnary
         #Keep it simple and like this : just loading image when needed, and use the file system cache for performance.
 
-        for root, dirs, files in os.walk(self.args.srctree[0]):
+        for root, _, files in os.walk(self.args.srctree[0]):
             #For each folder in the src tree
             for name in files:
                 #for each file in the folder
@@ -66,7 +66,7 @@ class KmdImagesMergeDateTree(KmdCmd.KmdCommand):
                 flist = os.listdir(pathtest)
                 
                 #We should at least first try to find an image with the same filename before crawling the whole directory
-                head, tail = os.path.split(p)
+                _, tail = os.path.split(p)
                 if tail in flist :
                     #In case both name matches !
                     logging.debug("%s found in flist", tail)
